@@ -1,3 +1,16 @@
+<template>
+  <a-select
+    v-model:value="value"
+    show-search
+    placeholder="Select a person"
+    style="width: 200px"
+    :options="options"
+    :filter-option="filterOption"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @change="handleChange"
+  ></a-select>
+</template>
 <script setup lang="ts">
 import pageheader from "../components/PageHeader.vue";
 import axios from "axios";
@@ -54,15 +67,4 @@ const filterOption = (input: string, option: any) => {
 };
 </script>
 
-<template>
-  <div v-if="options">{{ options }}</div>
-  <br />
-  <a-select
-    v-model:value="value"
-    show-search
-    placeholder="Select a person"
-    style="width: 200px"
-    :options="options"
-    :filter-option="filterOption"
-  ></a-select>
-</template>
+<style></style>
