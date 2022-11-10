@@ -3,16 +3,24 @@ import axios from "axios";
 import type { SelectProps } from "ant-design-vue";
 import { ref, onMounted, watch } from "vue";
 //initial//
+const UnSelectedData = ref([]);
+const SelectedData = ref<dataType[]>([]);
 const value = ref();
 const items = ref([]);
-let countItems: any = ref();
+const countItems = ref();
 const options = ref<SelectProps["options"]>([]);
-//interface
+//interface//
 interface optionsType {
   value: number;
   label: string;
 }
-//onMounted
+interface dataType {
+  first_name: string;
+  department: string;
+  position: string;
+  level: string;
+}
+//onMounted//
 onMounted(() => {
   console.log("mounted");
   getUsers();
@@ -22,9 +30,9 @@ async function getUsers() {
   try {
     const response = await axios.get("http://localhost:5000/users");
     items.value = response.data;
-    countItems = response.data.length;
-    console.log(`countItems2=${countItems}`);
-    for (let i = 0; i < countItems; i++) {
+    countItems.value = response.data.length;
+    console.log(`countItems2=${countItems.value}`);
+    for (let i = 0; i < countItems.value; i++) {
       const newitem: optionsType = {
         value: response.data[i].user_id as number,
         label: `${response.data[i].prefix as string}${
@@ -33,6 +41,9 @@ async function getUsers() {
       };
 
       options.value?.push(newitem);
+    }
+    for (let i = 0; i < items.value.length; i++) {
+      // console.log(`items=${(items.value[i] as any).first_name}`);
     }
   } catch (err) {
     console.log(err);
@@ -73,6 +84,7 @@ const onCheckAllChange = (e: any) => {
     indeterminate: false,
   });
   console.log(e.target.checked);
+  insertData();
 };
 //ทำงานก็ต่อเมื่อตัวแปรที่เรา watch มีการเปลี่ยนแปลง//
 watch(
@@ -86,14 +98,15 @@ watch(
 ///////////////////////table///////////////////
 const columns = [
   {
-    title: "ลำดับ",
-    dataIndex: "user_id",
-    width: "4%",
+    title: "การจัดการ",
+    width: "6%",
+    fixed: true,
   },
   {
     title: "เจ้าหน้าที่",
     dataIndex: "first_name",
     width: "13%",
+    fixed: true,
   },
   {
     title: "กลุ่ม/ฝ่าย",
@@ -111,7 +124,18 @@ const columns = [
     width: "10%",
   },
 ];
-const data = items.value;
+const insertData = () => {
+  console.log(`countItems3=${countItems.value}`);
+  for (let i = 0; i < countItems.value; i++) {
+    const newitem: dataType = {
+      first_name: (items.value[i] as any).first_name,
+      department: (items.value[i] as any).department,
+      position: (items.value[i] as any).position,
+      level: (items.value[i] as any).level,
+    };
+    SelectedData.value.push(newitem);
+  }
+};
 </script>
 <template>
   <a-select
@@ -143,12 +167,11 @@ const data = items.value;
 
   <div id="table">
     <a-table
-      :dataSource="data"
+      :dataSource="SelectedData"
       :columns="columns"
       size="small"
       :scroll="{ x: 1200, y: 200 }"
     ></a-table>
   </div>
 </template>
-
 <style></style>

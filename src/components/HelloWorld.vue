@@ -1,59 +1,102 @@
-<template>
-  <a-select
-    v-model:value="value"
-    mode="multiple"
-    label-in-value
-    placeholder="Select users"
-    style="width: 100%"
-    :filter-option="false"
-    :options="data"
-    @search="fetchUser"
-  >
-    <template v-if="fetching" #notFoundContent>
-      <a-spin size="small" />
-    </template>
-  </a-select>
-</template>
-<script>
-import { defineComponent, reactive, toRefs, watch } from "vue";
-import { debounce } from "lodash-es";
+<script setup lang="ts">
+import axios from "axios";
+import { SelectProps } from "ant-design-vue";
+import { ref, onMounted, watch } from "vue";
+//---------[interface]
+interface optionsType {
+  value: number;
+  label: string;
+}
+interface dataType {
+  user_id: number;
+  first_name: string;
+  department: string;
+  position: string;
+  level: string;
+}
 
-export default defineComponent({
-  setup() {
-    let lastFetchId = 0;
+//---------[initial]
+//duplicate from database
+const userData = ref([]);
+//basket
+const UnSelectedData = ref<dataType[]>([]);
+const SelectedData = ref<dataType[]>([]);
+//option
+const options = ref<SelectProps["options"]>([]);
 
-    const state = reactive({
-      data: [],
-      value: [],
-      fetching: false,
-    });
-
-    const fetchUser = debounce((value) => {
-      console.log("fetching user", value);
-      lastFetchId += 1;
-      const fetchId = lastFetchId;
-      state.data = [];
-      state.fetching = true;
-      fetch("https://randomuser.me/api/?results=5")
-        .then((response) => response.json())
-        .then((body) => {
-          if (fetchId !== lastFetchId) {
-            // for fetch callback order
-            return;
-          }
-          const data = body.results.map((user) => ({
-            label: `${user.name.first} ${user.name.last}`,
-            value: user.login.username,
-          }));
-          state.data = data;
-          state.fetching = false;
-        });
-    }, 300);
-
-    return {
-      ...toRefs(state),
-      fetchUser,
-    };
-  },
+//---------[connect to backend]
+//onMounted
+onMounted(() => {
+  console.log("mounted");
+  getUsers();
 });
+//getAllUsers
+async function getUsers() {
+  try {
+    const response = await axios.get("http://localhost:5000/users");
+    userData.value = response.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+//---------[method]
+//setUnselectedData: initial and reset data
+const setInitial = () => {
+  SelectedData.value = [];
+  UnSelectedData.value = [];
+};
+//getOptions
+const getOptions = () => {
+  console.log("getOptions");
+};
+//dropItem
+const dropItem = (basket: object, userID: number) => {
+  console.log("dropItem");
+};
+//insertItem
+const insertItem = (basket: object, userID: number) => {
+  console.log("insertItem");
+};
 </script>
+<template>
+  <!--selection-->
+  <div>
+    <a-select
+      v-model:value="value"
+      show-search
+      placeholder="Select a person"
+      style="width: 200px"
+      :options="options"
+      :filter-option="filterOption"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @change="handleChange"
+    />
+    <a-button>เพิ่มรายชื่อ</a-button>
+  </div>
+  <!--checkbox-->
+  <div>
+    <a-checkbox
+      v-model:checked="state.checkAll"
+      :indeterminate="state.indeterminate"
+      @change="onCheckAllChange"
+    >
+      ทั้งหมด
+    </a-checkbox>
+    <a-checkbox-group
+      v-model:value="state.checkedList"
+      :options="plainOpitons"
+    />
+  </div>
+  <!--table-->
+  <div>
+    <a-table
+      :dataSource="SelectedData"
+      :columns="columns"
+      size="small"
+      :scroll="{ x: 1200, y: 200 }"
+    />
+  </div>
+</template>
+<style></style>
