@@ -49,6 +49,25 @@ async function getUsers() {
     console.log(err);
   }
 }
+//test////////////////////
+const transferData = (orgBasket: any, desBasket: any, userID: number) => {
+  const select = ref([]);
+  //find Index
+  const index = orgBasket.findIndex((object: any) => {
+    return object.user_id == userID;
+  });
+  if (index > -1) {
+    // only splice array when item is found
+    select.value = orgBasket.splice(index, 1); // 2nd parameter means remove one item only
+  }
+  console.log(`select->${select}`);
+  desBasket.push(select);
+  // array = [2, 9]
+  console.log(`unselected->${desBasket}`);
+  console.log(`unselected->${orgBasket}`);
+  console.log("transferData");
+};
+/////////////////////////
 //Select Options Event
 const handleChange = (value: string) => {
   console.log(`selected ${value}`);
@@ -57,7 +76,10 @@ const handleBlur = () => {
   console.log("blur");
 };
 const handleFocus = () => {
+  (items.value as any).user_id = "id";
+  console.log(items);
   console.log("focus");
+  transferData(UnSelectedData, SelectedData, 1);
 };
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
