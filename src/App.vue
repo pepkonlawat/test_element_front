@@ -2,11 +2,11 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 
-import helloWorld from "./components/HelloWorld.vue";
+import UserPage from "./components/UserPage.vue";
 </script>
 
 <template>
-  <helloWorld />
+  <UserPage />
 </template>
 
 <style scoped></style>

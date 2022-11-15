@@ -119,10 +119,10 @@ const handleFocus = () => {
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
-const selected = () => {
-  UnSelectedData.value.find((x) => x.user_id === selectedOption.value.user_id);
-  console.log(selectedOption.value.user_id);
-};
+// const selected = () => {
+//   UnSelectedData.value.find((x) => x.user_id === selectedOption.value.user_id);
+//   console.log(selectedOption.value.user_id);
+// };
 //---------[checkbox]
 const onCheckAllChange = (e: any) => {
   console.log("onCheckAllChange");
@@ -154,23 +154,31 @@ const setInitial = () => {
   console.log(`UnSelectedData length : ${UnSelectedData.value.length}`);
   getOptions();
 };
-//insertItem--->orgBasket = Origin Basket and desBasket = Destination Basket
-const transferData = (orgBasket: any, desBasket: any, userID: number) => {
-  const select = ref([]);
-  //find Index
-  const index = orgBasket.findIndex((object: any) => {
-    return object.user_id == userID;
-  });
-  if (index > -1) {
-    // only splice array when item is found
-    select.value = orgBasket.splice(index, 1); // 2nd parameter means remove one item only
-  }
-  console.log(select);
-  desBasket.push(select);
-  // array = [2, 9]
-  console.log(orgBasket);
-  console.log("transferData");
+
+//----------[SelectedData]
+const selectedList = () => {
+  const index = selectedOption.value;
+  const selectedItem = (UnSelectedData as any).pop;
+  console.log(selectedItem); //user_id start at 1 but array index start at 1
+  getOptions();
 };
+//insertItem--->orgBasket = Origin Basket and desBasket = Destination Basket
+// const transferData = (orgBasket: any, desBasket: any, userID: number) => {
+//   const select = ref([]);
+//   //find Index
+//   const index = orgBasket.findIndex((object: any) => {
+//     return object.user_id == userID;
+//   });
+//   if (index > -1) {
+//     // only splice array when item is found
+//     select.value = orgBasket.splice(index, 1); // 2nd parameter means remove one item only
+//   }
+//   console.log(select);
+//   desBasket.push(select);
+//   // array = [2, 9]
+//   console.log(orgBasket);
+//   console.log("transferData");
+// };
 </script>
 <template>
   <!--selection-->
@@ -186,7 +194,7 @@ const transferData = (orgBasket: any, desBasket: any, userID: number) => {
       @blur="handleBlur"
       @change="handleChange"
     />
-    <a-button @click="selected">เพิ่มรายชื่อ</a-button>
+    <a-button @click="selectedList">เพิ่มรายชื่อ</a-button>
   </div>
   <!--checkbox-->
   <div>
@@ -205,7 +213,7 @@ const transferData = (orgBasket: any, desBasket: any, userID: number) => {
   <!--table-->
   <div>
     <a-table
-      :dataSource="UnSelectedData"
+      :dataSource="SelectedData"
       :columns="columns"
       size="small"
       :scroll="{ x: 1200, y: 200 }"
